@@ -161,15 +161,15 @@ void updatePercents() {
     if(previousPercents[i] < nextPercents[i]) {
       if(currentPercents[i] <= nextPercents[i]) {
         currentPercents[i] += servos[i].offset;
-        if(servos[i].offset > 0.01 || servos[i].offset < -0.01) { 
-          nextMove = false;
+        if(servos[i].offset > 0.001 || servos[i].offset < -0.001) { 
+         nextMove = false;
         }
       }
     }
     else if(previousPercents[i] > nextPercents[i]) {
       if(currentPercents[i] >= nextPercents[i]) {
         currentPercents[i] += servos[i].offset;
-        if(servos[i].offset > 0.01 || servos[i].offset < -0.01) nextMove = false;
+        if(servos[i].offset > 0.001 || servos[i].offset < -0.001) nextMove = false;
       }
     }
   }
@@ -186,7 +186,7 @@ void updatePercents() {
       previousPercents[i] = currentPercents[i];
       nextPercents[i] = moves[i][moveNumber];
     }  
-    delay(2000);
+    delay(1000);
   }
 }
 
@@ -197,11 +197,14 @@ void putStartingPosition() {
 }
 
 void calculatePercents() {
+   float baseRotation;
    putStartingPosition();
   for(int  i = 0; i < objectsX.size(); i++) {
     
     calculateShoulderElbowRotation(i, false);
-    moves[0].push_back(calculateBaseRotation(i, false));
+    baseRotation = calculateBaseRotation(i, false);
+    
+    moves[0].push_back(baseRotation);
     moves[1].push_back(startingPosition[1]);
     moves[2].push_back(startingPosition[2]);
     moves[3].push_back(startingPosition[3]);
@@ -209,7 +212,7 @@ void calculatePercents() {
     moves[5].push_back(startingPosition[5]);
     moves[6].push_back(startingPosition[6]);
     
-    moves[0].push_back(calculateBaseRotation(i, false));
+    moves[0].push_back(baseRotation);
     moves[1].push_back(shoulder_angle);
     moves[2].push_back(shoulder_angle);
     moves[3].push_back(elbow_angle);
@@ -217,7 +220,7 @@ void calculatePercents() {
     moves[5].push_back(startingPosition[5]);
     moves[6].push_back(startingPosition[6]);
     
-    moves[0].push_back(calculateBaseRotation(i, false));
+    moves[0].push_back(baseRotation);
     moves[1].push_back(shoulder_angle);
     moves[2].push_back(shoulder_angle);
     moves[3].push_back(elbow_angle);
@@ -225,7 +228,7 @@ void calculatePercents() {
     moves[5].push_back(startingPosition[5]);
     moves[6].push_back(0.2);
     
-    moves[0].push_back(calculateBaseRotation(i, false));
+    moves[0].push_back(baseRotation);
     moves[1].push_back(startingPosition[1]);
     moves[2].push_back(startingPosition[2]);
     moves[3].push_back(startingPosition[3]);
@@ -233,8 +236,10 @@ void calculatePercents() {
     moves[5].push_back(startingPosition[5]);
     moves[6].push_back(0.2);
     
-    calculateShoulderElbowRotation(i, true);;
-    moves[0].push_back(calculateBaseRotation(i, true));
+    calculateShoulderElbowRotation(i, true);
+    baseRotation = calculateBaseRotation(i, true);
+    
+    moves[0].push_back(baseRotation);
     moves[1].push_back(startingPosition[1]);
     moves[2].push_back(startingPosition[2]);
     moves[3].push_back(startingPosition[3]);
@@ -242,7 +247,7 @@ void calculatePercents() {
     moves[5].push_back(startingPosition[5]);
     moves[6].push_back(0.2);
     
-    moves[0].push_back(calculateBaseRotation(i, true));
+    moves[0].push_back(baseRotation);
     moves[1].push_back(shoulder_angle);
     moves[2].push_back(shoulder_angle);
     moves[3].push_back(elbow_angle);
@@ -250,7 +255,7 @@ void calculatePercents() {
     moves[5].push_back(startingPosition[5]);
     moves[6].push_back(0.2);
     
-    moves[0].push_back(calculateBaseRotation(i, true));
+    moves[0].push_back(baseRotation);
     moves[1].push_back(shoulder_angle);
     moves[2].push_back(shoulder_angle);
     moves[3].push_back(elbow_angle);
@@ -258,20 +263,21 @@ void calculatePercents() {
     moves[5].push_back(startingPosition[5]);
     moves[6].push_back(startingPosition[6]);
 
-    moves[0].push_back(calculateBaseRotation(i, true));
+    moves[0].push_back(baseRotation);
     moves[1].push_back(startingPosition[1]);
     moves[2].push_back(startingPosition[2]);
     moves[3].push_back(startingPosition[3]);
     moves[4].push_back(startingPosition[4]);
     moves[5].push_back(startingPosition[5]);
-    moves[6].push_back(0.2);
+    moves[6].push_back(startingPosition[6]);
   
     putStartingPosition();
    }
    
-   int length = moves[0].size();
-
-     objectsX.clear();
+   int movesLength = moves[0].size();
+Serial.println("Moves");
+Serial.println(movesLength);
+  objectsX.clear();
   objectsY.clear();
   objectsZ.clear();
   objectsDestinationX.clear();
@@ -309,9 +315,9 @@ float calculateWristRotation() {
       Serial.println("th_2");
     Serial.println(th_2);*/
   Serial.println("th_3");
-    Serial.println(th_3);
+  Serial.println(th_3);
   Serial.println("wrist");
-    Serial.println(angle);
+  Serial.println(angle);
   return angle;  
 }
 
@@ -344,15 +350,15 @@ void calculateShoulderElbowRotation(int index, bool destination) {
     shoulder_angle = (180 - th_1- servos[1].minAngle) / (servos[1].maxAngle - servos[1].minAngle);
     elbow_angle = (90-th_2 - servos[3].minAngle) / (servos[3].maxAngle - servos[3].minAngle);
       
-        Serial.println("shoulder");
+    Serial.println("shoulder");
     Serial.println(shoulder_angle);
-            Serial.println("elbow");
+    Serial.println("elbow");
     Serial.println(elbow_angle);
     Serial.println("reach");
     Serial.println(reach);
     Serial.println("k_1");
     Serial.println(k_1);
-        Serial.println("k_2");
+    Serial.println("k_2");
     Serial.println(k_2);
     Serial.println("gamma");
     Serial.println(gamma);
@@ -531,7 +537,7 @@ void loop()
    
    sendData();
   }
-   delay(40);
+   delay(35);
   //delay(1000);
 }
 
